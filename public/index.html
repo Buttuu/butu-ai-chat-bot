@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Butu AI Chat</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <!-- 🌤️ Animated Sky Background -->
+  <div class="sky-cycle">
+    <div class="sky dawn"></div>
+    <div class="sky morning"></div>
+    <div class="sky noon"></div>
+    <div class="sky dusk"></div>
+    <div class="sky night"></div>
+
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    <div class="cloud cloud-5"></div>
+    <div class="cloud cloud-6"></div>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-box" id="chatbot-messages">
+      <div class="message bot">
+        <img src="bot.png" alt="Bot" class="avatar">
+        <div class="bubble">Hello! I'm Butu, your AI assistant. Ask me anything!</div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="input-wrapper">
+        <input type="text" id="chatbot-input" placeholder="Type your message..." autocomplete="off" />
+        <label for="file-input" class="attach-icon"><i class="fas fa-paperclip"></i></label>
+        <input type="file" id="file-input" class="file-input" />
+        <div class="file-preview-inline" id="file-preview-inline"></div>
+      </div>
+      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
