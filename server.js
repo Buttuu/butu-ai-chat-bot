@@ -1,3 +1,5 @@
+require("dotenv").config({ path: __dirname + "/.env" });
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -7,26 +9,31 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// 🔑 HARD-CODED OPENROUTER API KEY (LOCAL TESTING ONLY)
-const OPENROUTER_API_KEY = "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";
+/* ================================
+   OPENROUTER API KEY FROM .env
+================================ */
+
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 if (!OPENROUTER_API_KEY) {
-  console.error("❌ OpenRouter API key missing");
+  console.error("❌ OpenRouter API key missing. Add it to .env file.");
   process.exit(1);
 }
 
 /* ================================
    SERVE FRONTEND
 ================================ */
-app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 /* ================================
-   CHAT API (VISION + ENGLISH FORCED)
+   CHAT API (TEXT + IMAGE)
 ================================ */
+
 app.post("/chat", async (req, res) => {
   try {
     const { message, imageBase64 } = req.body;
@@ -37,9 +44,7 @@ app.post("/chat", async (req, res) => {
       userContent = [
         {
           type: "text",
-          text: `Reply ONLY in English.
-
-${message || "Describe this image in detail."}`
+          text: `Reply ONLY in English.\n\n${message || "Describe this image in detail."}`
         },
         {
           type: "image_url",
@@ -49,9 +54,7 @@ ${message || "Describe this image in detail."}`
         }
       ];
     } else {
-      userContent = `Reply ONLY in English.
-
-${message || "Say hello."}`;
+      userContent = `Reply ONLY in English.\n\n${message || "Say hello."}`;
     }
 
     const response = await fetch(
@@ -59,18 +62,18 @@ ${message || "Say hello."}`;
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
           "HTTP-Referer": "http://localhost:3000",
           "X-Title": "Butu AI Vision Chatbot"
         },
         body: JSON.stringify({
-          model: "openai/gpt-4o",
+          model: "openai/gpt-4o",   // cheaper model
           messages: [
             {
               role: "system",
               content:
-                "You are Butu, a helpful AI assistant. You MUST reply only in English. Never use any other language."
+                "You are Butu, a helpful AI assistant. You MUST reply only in English."
             },
             {
               role: "user",
@@ -78,14 +81,14 @@ ${message || "Say hello."}`;
             }
           ],
           temperature: 0.4,
-          max_tokens: 500
+          max_tokens: 200
         })
       }
     );
 
     if (!response.ok) {
       const err = await response.text();
-      console.error("❌ OpenRouter error:", err);
+      console.error("❌ OpenRouter API error:", err);
       return res.status(500).json({ reply: "AI service error." });
     }
 
@@ -96,6 +99,7 @@ ${message || "Say hello."}`;
       "I couldn't analyze that.";
 
     res.json({ reply });
+
   } catch (err) {
     console.error("❌ Backend error:", err);
     res.status(500).json({ reply: "Server error." });
@@ -105,8 +109,9 @@ ${message || "Say hello."}`;
 /* ================================
    START SERVER
 ================================ */
-const PORT = 3000;
+
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`✅ Butu AI running at http://localhost:${PORT}`);
 });
-
